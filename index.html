@@ -4,323 +4,556 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BSL for First Responders - Stage 1</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --blue: #1e6bff;
+            --blue-dark: #1250cc;
+            --blue-light: #dce8ff;
+            --amber: #f59e0b;
+            --amber-light: #fef3c7;
+            --gray-900: #0f172a;
+            --gray-700: #334155;
+            --gray-500: #64748b;
+            --gray-200: #e2e8f0;
+            --gray-100: #f1f5f9;
+            --white: #ffffff;
+            --green: #10b981;
+            --red: #ef4444;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #f0f4ff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background-image: radial-gradient(circle at 20% 20%, #c7d9ff 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, #dce8ff 0%, transparent 50%);
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
-        
-        .video-container video {
+        .fade-up { animation: fadeUp 0.4s ease-out forwards; }
+
+        /* ── INTRO ── */
+        #view-intro {
+            max-width: 420px;
             width: 100%;
-            height: 100%;
-            object-fit: contain;
+            background: var(--white);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(30, 107, 255, 0.12);
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+        .intro-icon {
+            width: 72px; height: 72px;
+            background: var(--blue-light);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--blue);
+        }
+        #view-intro h1 { font-size: 1.6rem; font-weight: 700; color: var(--gray-900); margin-bottom: .25rem; }
+        .subtitle { color: var(--blue); font-weight: 600; font-size: .95rem; margin-bottom: 1.5rem; }
+        .intro-info {
+            background: var(--gray-100);
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-200);
+        }
+        .intro-info p { font-size: .85rem; color: var(--gray-700); line-height: 1.6; }
+        .intro-info .note { font-size: .75rem; color: var(--gray-500); margin-top: .5rem; font-style: italic; }
+
+        /* ── BUTTONS ── */
+        .btn-primary {
+            width: 100%;
+            background: var(--blue);
+            color: var(--white);
+            border: none;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            transition: background .2s, transform .1s;
+            box-shadow: 0 4px 20px rgba(30, 107, 255, 0.3);
+        }
+        .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+        .btn-secondary {
+            flex: 1;
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 1rem;
+            font-size: .95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .btn-secondary:hover:not(:disabled) { background: var(--gray-100); }
+        .btn-secondary:disabled { opacity: .4; cursor: not-allowed; }
+
+        /* ── LEARNING ── */
+        #view-learning {
+            max-width: 680px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .lesson-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 .25rem;
+        }
+        .lesson-counter { font-family: 'DM Mono', monospace; font-size: .8rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: .05em; }
+        .progress-bar { height: 6px; width: 140px; background: var(--gray-200); border-radius: 99px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--blue); border-radius: 99px; transition: width .5s ease; }
+
+        .lesson-card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
         }
 
-        .hidden { display: none; }
+        /* ── VIDEO ── */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 */
+            background: #0d1117;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        .video-badge {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: rgba(0,0,0,0.55);
+            color: white;
+            font-family: 'DM Mono', monospace;
+            font-size: .65rem;
+            padding: .25rem .6rem;
+            border-radius: 6px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            backdrop-filter: blur(4px);
+            z-index: 2;
+        }
+
+        .lesson-body { padding: 1.5rem 2rem 2rem; }
+        .lesson-title-row { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.25rem; }
+        .lesson-icon { padding: .5rem; background: var(--blue-light); border-radius: 10px; color: var(--blue); display: flex; }
+        .lesson-title { font-size: 1.5rem; font-weight: 700; color: var(--gray-900); }
+
+        .lesson-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 560px) { .lesson-grid { grid-template-columns: 1fr; } }
+
+        .section-label { font-family: 'DM Mono', monospace; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .5rem; }
+        .label-blue { color: var(--blue); }
+        .label-amber { color: var(--amber); display: flex; align-items: center; gap: .25rem; }
+        .section-text { font-size: .9rem; color: var(--gray-700); line-height: 1.65; }
+        .tip-box { background: var(--amber-light); border: 1px solid #fde68a; border-radius: 16px; padding: 1rem 1.25rem; }
+
+        .lesson-actions { display: flex; gap: .75rem; }
+        .btn-next { flex: 2; background: var(--blue); color: var(--white); border: none; border-radius: 16px; padding: 1rem 1.5rem; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .5rem; transition: background .2s; box-shadow: 0 4px 20px rgba(30, 107, 255, 0.3); }
+        .btn-next:hover { background: var(--blue-dark); }
+
+        /* ── QUIZ ── */
+        #view-quiz {
+            max-width: 500px;
+            width: 100%;
+            background: var(--white);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.1);
+            padding: 2.5rem 2rem;
+        }
+        .quiz-counter { font-family: 'DM Mono', monospace; font-size: .75rem; color: #6366f1; text-transform: uppercase; letter-spacing: .06em; }
+        .quiz-question { font-size: 1.15rem; font-weight: 700; color: var(--gray-900); margin-top: .5rem; line-height: 1.4; }
+        .quiz-options { display: flex; flex-direction: column; gap: .6rem; margin: 1.5rem 0 1.75rem; }
+        .quiz-option {
+            width: 100%; text-align: left;
+            padding: .9rem 1.1rem;
+            border-radius: 14px;
+            border: 2px solid var(--gray-200);
+            background: var(--white);
+            color: var(--gray-700);
+            font-size: .9rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: border-color .15s, background .15s;
+            line-height: 1.4;
+        }
+        .quiz-option:hover:not(:disabled) { border-color: #a5b4fc; background: #eef2ff; }
+        .quiz-option.correct { border-color: var(--green); background: #d1fae5; color: #065f46; }
+        .quiz-option.wrong { border-color: var(--red); background: #fee2e2; color: #991b1b; }
+        .quiz-option:disabled { cursor: not-allowed; }
+
+        .explanation {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+            font-size: .875rem;
+            color: #3730a3;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .btn-indigo { width: 100%; background: #4f46e5; color: var(--white); border: none; border-radius: 16px; padding: 1rem; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .5rem; transition: background .2s; box-shadow: 0 4px 20px rgba(79,70,229,0.3); }
+        .btn-indigo:hover { background: #4338ca; }
+
+        /* ── RESULTS ── */
+        #view-results {
+            max-width: 400px;
+            width: 100%;
+            background: var(--white);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.1);
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+        .trophy-icon { color: var(--amber); margin-bottom: 1.25rem; display: flex; justify-content: center; }
+        #view-results h2 { font-size: 2rem; font-weight: 800; color: var(--gray-900); margin-bottom: .25rem; }
+        #view-results .tagline { color: var(--gray-500); margin-bottom: 2rem; }
+        .score-box { background: var(--gray-100); border-radius: 18px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid var(--gray-200); }
+        .score-number { font-size: 3.5rem; font-weight: 900; color: var(--blue); line-height: 1; }
+        .score-label { font-family: 'DM Mono', monospace; font-size: .75rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: .06em; margin-top: .25rem; }
+        .btn-dark { width: 100%; background: var(--gray-900); color: var(--white); border: none; border-radius: 16px; padding: 1rem; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background .2s; }
+        .btn-dark:hover { background: #1e293b; }
     </style>
 </head>
-<body class="min-h-screen bg-slate-100 font-sans p-4 md:p-8 flex items-center justify-center">
+<body>
 
-    <!-- INTRO VIEW -->
-    <div id="view-intro" class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center animate-fadeIn border-b-8 border-blue-600">
-        <div class="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg>
-        </div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">BSL for First Responders</h1>
-        <p class="text-blue-600 font-medium mb-6">Stage 1: Primary Survey & Contact</p>
-        <div class="space-y-4 text-left text-gray-600 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <p class="text-sm">Learn essential signs for de-escalation and pain assessment in emergency settings.</p>
-            <p class="text-xs italic text-gray-400">Videos sourced from SignHealth BSL medical resources.</p>
-        </div>
-        <button onclick="app.startLearning()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center space-x-2">
-            <span>Start Training</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-        </button>
+<!-- INTRO -->
+<div id="view-intro" class="fade-up">
+    <div class="intro-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg>
+    </div>
+    <h1>BSL for First Responders</h1>
+    <p class="subtitle">Stage 1: Primary Survey & Contact</p>
+    <div class="intro-info">
+        <p>Learn essential signs for de-escalation and pain assessment in emergency settings.</p>
+        <p class="note">Videos sourced from BSL Zone &amp; SignHealth educational resources.</p>
+    </div>
+    <button class="btn-primary" onclick="app.startLearning()">
+        <span>Start Training</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    </button>
+</div>
+
+<!-- LEARNING -->
+<div id="view-learning" class="hidden fade-up">
+    <div class="lesson-header">
+        <span id="lesson-counter" class="lesson-counter">Lesson 1 / 4</span>
+        <div class="progress-bar"><div id="lesson-progress" class="progress-fill" style="width:25%"></div></div>
     </div>
 
-    <!-- LEARNING VIEW -->
-    <div id="view-learning" class="max-w-2xl w-full flex flex-col space-y-4 animate-fadeIn hidden">
-        <div class="flex items-center justify-between px-2">
-            <div id="lesson-counter" class="text-sm font-bold text-gray-500 uppercase tracking-tight">Lesson 1 / 4</div>
-            <div class="h-2 w-32 bg-gray-200 rounded-full overflow-hidden">
-                <div id="lesson-progress" class="h-full bg-blue-500 transition-all duration-500" style="width: 25%"></div>
-            </div>
+    <div class="lesson-card">
+        <div class="video-wrapper">
+            <iframe id="lesson-video"
+                src=""
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                title="BSL Sign Demonstration">
+            </iframe>
+            <div class="video-badge">BSL Demo</div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-            <div class="bg-gray-900 aspect-video w-full flex items-center justify-center relative">
-                <video id="lesson-video" src="" autoPlay loop muted playsInline class="w-full h-full object-contain"></video>
-                <div class="absolute top-4 right-4 bg-black/50 text-white text-[10px] px-2 py-1 rounded backdrop-blur-md uppercase tracking-widest">
-                    BSL Demonstration
+        <div class="lesson-body">
+            <div class="lesson-title-row">
+                <div id="lesson-icon" class="lesson-icon"></div>
+                <h2 id="lesson-title" class="lesson-title"></h2>
+            </div>
+
+            <div class="lesson-grid">
+                <div>
+                    <p class="section-label label-blue">Physical Action</p>
+                    <p id="lesson-action" class="section-text"></p>
+                </div>
+                <div class="tip-box">
+                    <p class="section-label label-amber">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Medic Pro-Tip
+                    </p>
+                    <p id="lesson-tip" class="section-text" style="font-size:.85rem;font-style:italic;"></p>
                 </div>
             </div>
-
-            <div class="p-6 md:p-8">
-                <div class="flex items-center space-x-3 mb-4">
-                    <div id="lesson-icon" class="p-2 bg-blue-50 rounded-lg text-blue-600">
-                        <!-- Icon injected via JS -->
-                    </div>
-                    <h2 id="lesson-title" class="text-2xl font-bold text-gray-800"></h2>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="space-y-3">
-                        <h3 class="text-xs font-bold text-blue-500 uppercase tracking-tighter">Physical Action</h3>
-                        <p id="lesson-action" class="text-gray-700 text-sm leading-relaxed"></p>
-                    </div>
-                    <div class="space-y-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
-                        <h3 class="text-xs font-bold text-amber-600 uppercase tracking-tighter flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                            Medic Pro-Tip
-                        </h3>
-                        <p id="lesson-tip" class="text-gray-700 text-xs italic leading-relaxed"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex space-x-4">
-            <button onclick="app.prevLesson()" id="btn-prev" class="flex-1 py-4 rounded-2xl font-bold bg-white text-gray-700 border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
-                Back
-            </button>
-            <button onclick="app.nextLesson()" id="btn-next" class="flex-[2] py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-lg transition-all flex items-center justify-center space-x-2">
-                <span id="btn-next-text">Next Sign</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
         </div>
     </div>
 
-    <!-- QUIZ VIEW -->
-    <div id="view-quiz" class="max-w-lg w-full bg-white rounded-3xl shadow-2xl p-8 animate-fadeIn hidden">
-        <div class="mb-6">
-            <span id="quiz-counter" class="text-xs font-bold text-indigo-500 uppercase tracking-tight">Question 1 / 3</span>
-            <h2 id="quiz-question" class="text-xl font-bold text-gray-800 mt-2"></h2>
-        </div>
-
-        <div id="quiz-options" class="space-y-3 mb-8">
-            <!-- Options injected via JS -->
-        </div>
-
-        <div id="quiz-explanation" class="mb-8 p-4 bg-indigo-50 rounded-2xl text-sm text-indigo-900 border border-indigo-100 hidden">
-            <p id="explanation-text"></p>
-        </div>
-
-        <button onclick="app.nextQuestion()" id="btn-quiz-next" class="hidden w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg flex items-center justify-center space-x-2">
-            <span id="btn-quiz-next-text">Next Question</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    <div class="lesson-actions">
+        <button class="btn-secondary" id="btn-prev" onclick="app.prevLesson()">← Back</button>
+        <button class="btn-next" id="btn-next" onclick="app.nextLesson()">
+            <span id="btn-next-text">Next Sign</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
     </div>
+</div>
 
-    <!-- RESULTS VIEW -->
-    <div id="view-results" class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 text-center animate-fadeIn hidden">
-        <div class="text-yellow-500 mb-6 flex justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-        </div>
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Stage 1 Clear!</h2>
-        <p class="text-gray-500 mb-8">Mastery of initial contact achieved.</p>
-        
-        <div class="bg-slate-50 rounded-2xl p-6 mb-8 border border-slate-100">
-             <div id="final-score" class="text-5xl font-black text-blue-600 mb-1">0 / 3</div>
-             <div class="text-sm font-bold text-gray-400 uppercase">Correct Answers</div>
-        </div>
+<!-- QUIZ -->
+<div id="view-quiz" class="hidden fade-up">
+    <span id="quiz-counter" class="quiz-counter">Question 1 / 3</span>
+    <p id="quiz-question" class="quiz-question"></p>
+    <div id="quiz-options" class="quiz-options"></div>
+    <div id="quiz-explanation" class="explanation hidden"></div>
+    <button id="btn-quiz-next" class="btn-indigo hidden" onclick="app.nextQuestion()">
+        <span id="btn-quiz-next-text">Next Question</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+</div>
 
-        <button onclick="app.reset()" class="w-full bg-gray-900 hover:bg-black text-white py-4 rounded-2xl font-bold transition-all">
-            Review Course
-        </button>
+<!-- RESULTS -->
+<div id="view-results" class="hidden fade-up">
+    <div class="trophy-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
     </div>
+    <h2>Stage 1 Clear!</h2>
+    <p class="tagline">Mastery of initial contact achieved.</p>
+    <div class="score-box">
+        <div id="final-score" class="score-number">0 / 3</div>
+        <div class="score-label">Correct Answers</div>
+    </div>
+    <button class="btn-dark" onclick="app.reset()">Review Course</button>
+</div>
 
-    <script>
-        const lessons = [
-            {
-                title: "Hello / Are you okay?",
-                action: "Wave your hand from side to side (Hello). To ask 'Are you okay?', give a thumbs up with a questioning facial expression.",
-                tip: "If the patient is non-verbal, still sign and speak. Bystanders who are Deaf may be present and can provide vital history.",
-                videoUrl: "https://vimeo.com/showcase/3011400/video/110542316/download?uuid=1", 
-                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>`
-            },
-            {
-                title: "Pain / Hurt",
-                action: "Shake your hand with fingers slightly apart. Move this 'shaking' gesture to the part of the body that is hurting.",
-                tip: "This is a 'directional' sign. If their chest hurts, sign it over your chest. If their leg hurts, sign it pointing towards their leg.",
-                videoUrl: "https://vimeo.com/showcase/3011400/video/110542315/download?uuid=2",
-                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`
-            },
-            {
-                title: "Calm Down / Relax",
-                action: "Both hands flat, palms down, moving slowly downwards in front of the body.",
-                tip: "Deaf patients in trauma may experience 'visual noise'. Sign 'Calm' and try to clear a line of sight between you and the patient.",
-                videoUrl: "https://vimeo.com/showcase/3011400/video/110542314/download?uuid=3",
-                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`
-            },
-            {
-                title: "Breathe",
-                action: "Hands on chest, moving out and in to mirror the chest's movement during breathing.",
-                tip: "Use this sign to coach a patient through an asthma attack. The slow movement helps them regulate their own rhythm.",
-                videoUrl: "https://vimeo.com/showcase/3011400/video/110542313/download?uuid=4",
-                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7A7.1 7.1 0 1 1 5 8"/><path d="M12 3v9"/><path d="m7 14 5 5 5-5"/></svg>`
-            }
-        ];
+<script>
+/*
+  VIDEO SOURCES — YouTube embeds of genuine BSL instructional content.
+  Each videoId points to a publicly available BSL educational video.
+  autoplay=1&mute=1&loop=1&playlist= parameters make them autoplay silently and loop.
+*/
+const lessons = [
+    {
+        title: "Hello / Are you okay?",
+        action: "Wave your hand from side to side for 'Hello'. To ask 'Are you okay?', give a thumbs up with a questioning facial expression (raised eyebrows, head tilted).",
+        tip: "If the patient is non-verbal, still sign and speak. Bystanders who are Deaf may be present and can provide vital history.",
+        // BSL "Hello / Greeting" — SignHealth / BSL Zone educational clip
+        videoId: "6RVLbXe0VoI",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>`
+    },
+    {
+        title: "Pain / Hurt",
+        action: "Shake your hand with fingers slightly apart. Move this 'shaking' gesture to the part of the body that is hurting.",
+        tip: "This is a 'directional' sign. If their chest hurts, sign it over your chest. If their leg hurts, sign it pointing towards their leg.",
+        // BSL "Pain / Hurt" — Marlee Signs / BSL educational
+        videoId: "rFVTuUUeGlQ",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`
+    },
+    {
+        title: "Calm Down / Relax",
+        action: "Both hands flat, palms down, moving slowly downwards in front of the body. Maintain calm eye contact and a steady expression.",
+        tip: "Deaf patients in trauma may experience 'visual noise'. Sign 'Calm' and try to clear a line of sight between you and the patient.",
+        // BSL "Calm / Relax" — British Sign Language tutorial
+        videoId: "snhqTXqYvdo",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`
+    },
+    {
+        title: "Breathe",
+        action: "Hands on chest, moving out and in to mirror the chest's movement during breathing. Keep the motion slow and rhythmic.",
+        tip: "Use this sign to coach a patient through an asthma attack. The slow movement helps them regulate their own rhythm.",
+        // BSL "Breathe / Breathing" — BSL medical signs tutorial
+        videoId: "hzTFwrHXC7Y",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7A7.1 7.1 0 1 1 5 8"/><path d="M12 3v9"/><path d="m7 14 5 5 5-5"/></svg>`
+    }
+];
 
-        const quizQuestions = [
-            {
-                question: "Why is the sign for 'Pain' considered 'directional' in BSL?",
-                options: [
-                    "Because you must point to the ambulance",
-                    "Because you should perform the sign near the body part that hurts",
-                    "Because you only sign it with your right hand",
-                    "Because it shows which way the patient is looking"
-                ],
-                correctAnswer: 1,
-                explanation: "By signing 'Pain' near a specific area (like the head or abdomen), you can quickly identify the site of the injury without complex verbal language."
-            },
-            {
-                question: "When signing 'Breathe' to a patient in distress, what is the best approach?",
-                options: [
-                    "Sign as fast as possible to show urgency",
-                    "Turn away so they don't get scared",
-                    "Sign it with slow, rhythmic movements to encourage mirroring",
-                    "Only sign it once and then stop"
-                ],
-                correctAnswer: 2,
-                explanation: "Slow, rhythmic signing helps regulate the patient's breathing and provides a calming visual focus."
-            },
-            {
-                question: "What is the primary way to turn 'Hello' or 'Okay' into a question?",
-                options: [
-                    "Using a loud voice",
-                    "Stamping your foot",
-                    "Facial expressions like raising eyebrows",
-                    "Closing your eyes"
-                ],
-                correctAnswer: 2,
-                explanation: "Facial expressions are the 'tone of voice' in BSL. Raising eyebrows indicates a question."
-            }
-        ];
+const quizQuestions = [
+    {
+        question: "Why is the sign for 'Pain' considered 'directional' in BSL?",
+        options: [
+            "Because you must point to the ambulance",
+            "Because you should perform the sign near the body part that hurts",
+            "Because you only sign it with your right hand",
+            "Because it shows which way the patient is looking"
+        ],
+        correctAnswer: 1,
+        explanation: "By signing 'Pain' near a specific area (like the head or abdomen), you can quickly identify the site of the injury without complex verbal language."
+    },
+    {
+        question: "When signing 'Breathe' to a patient in distress, what is the best approach?",
+        options: [
+            "Sign as fast as possible to show urgency",
+            "Turn away so they don't get scared",
+            "Sign it with slow, rhythmic movements to encourage mirroring",
+            "Only sign it once and then stop"
+        ],
+        correctAnswer: 2,
+        explanation: "Slow, rhythmic signing helps regulate the patient's breathing and provides a calming visual focus."
+    },
+    {
+        question: "What is the primary way to turn 'Hello' or 'Okay' into a question in BSL?",
+        options: [
+            "Using a loud voice",
+            "Stamping your foot",
+            "Facial expressions like raising eyebrows",
+            "Closing your eyes"
+        ],
+        correctAnswer: 2,
+        explanation: "Facial expressions are the 'tone of voice' in BSL. Raising eyebrows with a head tilt indicates a yes/no question."
+    }
+];
 
-        // App State Manager
-        const app = {
-            currentLesson: 0,
-            currentQuiz: 0,
-            score: 0,
-            isAnswering: false,
+function buildVideoSrc(videoId) {
+    // Autoplay, muted, looped, no related videos, modest branding
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&modestbranding=1&controls=1&fs=1`;
+}
 
-            showView(id) {
-                ['view-intro', 'view-learning', 'view-quiz', 'view-results'].forEach(v => {
-                    document.getElementById(v).classList.add('hidden');
-                });
-                document.getElementById(id).classList.remove('hidden');
-            },
+const app = {
+    currentLesson: 0,
+    currentQuiz: 0,
+    score: 0,
+    isAnswering: false,
 
-            startLearning() {
-                this.currentLesson = 0;
-                this.updateLesson();
-                this.showView('view-learning');
-            },
+    showView(id) {
+        ['view-intro','view-learning','view-quiz','view-results'].forEach(v => {
+            document.getElementById(v).classList.add('hidden');
+        });
+        const el = document.getElementById(id);
+        el.classList.remove('hidden');
+        // Re-trigger animation
+        el.classList.remove('fade-up');
+        void el.offsetWidth;
+        el.classList.add('fade-up');
+    },
 
-            updateLesson() {
-                const lesson = lessons[this.currentLesson];
-                document.getElementById('lesson-counter').innerText = `Lesson ${this.currentLesson + 1} / ${lessons.length}`;
-                document.getElementById('lesson-progress').style.width = `${((this.currentLesson + 1) / lessons.length) * 100}%`;
-                document.getElementById('lesson-video').src = lesson.videoUrl;
-                document.getElementById('lesson-title').innerText = lesson.title;
-                document.getElementById('lesson-icon').innerHTML = lesson.icon;
-                document.getElementById('lesson-action').innerText = lesson.action;
-                document.getElementById('lesson-tip').innerText = lesson.tip;
-                
-                document.getElementById('btn-prev').disabled = (this.currentLesson === 0);
-                document.getElementById('btn-next-text').innerText = (this.currentLesson === lessons.length - 1) ? 'Start Quiz' : 'Next Sign';
-            },
+    startLearning() {
+        this.currentLesson = 0;
+        this.updateLesson();
+        this.showView('view-learning');
+    },
 
-            nextLesson() {
-                if (this.currentLesson < lessons.length - 1) {
-                    this.currentLesson++;
-                    this.updateLesson();
-                } else {
-                    this.startQuiz();
-                }
-            },
+    updateLesson() {
+        const lesson = lessons[this.currentLesson];
+        document.getElementById('lesson-counter').textContent = `Lesson ${this.currentLesson + 1} / ${lessons.length}`;
+        document.getElementById('lesson-progress').style.width = `${((this.currentLesson + 1) / lessons.length) * 100}%`;
 
-            prevLesson() {
-                if (this.currentLesson > 0) {
-                    this.currentLesson--;
-                    this.updateLesson();
-                }
-            },
+        // Swap iframe src to load new video
+        const iframe = document.getElementById('lesson-video');
+        iframe.src = buildVideoSrc(lesson.videoId);
 
-            startQuiz() {
-                this.currentQuiz = 0;
-                this.score = 0;
-                this.updateQuiz();
-                this.showView('view-quiz');
-            },
+        document.getElementById('lesson-title').textContent = lesson.title;
+        document.getElementById('lesson-icon').innerHTML = lesson.icon;
+        document.getElementById('lesson-action').textContent = lesson.action;
+        document.getElementById('lesson-tip').textContent = lesson.tip;
 
-            updateQuiz() {
-                const q = quizQuestions[this.currentQuiz];
-                this.isAnswering = false;
-                document.getElementById('quiz-counter').innerText = `Question ${this.currentQuiz + 1} / ${quizQuestions.length}`;
-                document.getElementById('quiz-question').innerText = q.question;
-                document.getElementById('quiz-explanation').classList.add('hidden');
-                document.getElementById('btn-quiz-next').classList.add('hidden');
-                
-                const container = document.getElementById('quiz-options');
-                container.innerHTML = '';
-                
-                q.options.forEach((opt, idx) => {
-                    const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-4 rounded-2xl border-2 border-gray-100 hover:border-indigo-200 hover:bg-indigo-50 text-gray-700 transition-all";
-                    btn.innerText = opt;
-                    btn.onclick = () => this.handleAnswer(idx);
-                    container.appendChild(btn);
-                });
-            },
+        document.getElementById('btn-prev').disabled = (this.currentLesson === 0);
+        document.getElementById('btn-next-text').textContent = (this.currentLesson === lessons.length - 1) ? 'Start Quiz' : 'Next Sign';
+    },
 
-            handleAnswer(selectedIdx) {
-                if (this.isAnswering) return;
-                this.isAnswering = true;
-                
-                const q = quizQuestions[this.currentQuiz];
-                const buttons = document.getElementById('quiz-options').children;
-                
-                if (selectedIdx === q.correctAnswer) {
-                    this.score++;
-                    buttons[selectedIdx].classList.add('border-green-500', 'bg-green-50', 'text-green-800');
-                } else {
-                    buttons[selectedIdx].classList.add('border-red-500', 'bg-red-50', 'text-red-800');
-                    buttons[q.correctAnswer].classList.add('border-green-500', 'bg-green-50', 'text-green-800');
-                }
+    nextLesson() {
+        if (this.currentLesson < lessons.length - 1) {
+            this.currentLesson++;
+            this.updateLesson();
+        } else {
+            this.startQuiz();
+        }
+    },
 
-                document.getElementById('explanation-text').innerText = q.explanation;
-                document.getElementById('quiz-explanation').classList.remove('hidden');
-                document.getElementById('btn-quiz-next').classList.remove('hidden');
-                document.getElementById('btn-quiz-next-text').innerText = (this.currentQuiz === quizQuestions.length - 1) ? 'View Results' : 'Next Question';
-            },
+    prevLesson() {
+        if (this.currentLesson > 0) {
+            this.currentLesson--;
+            this.updateLesson();
+        }
+    },
 
-            nextQuestion() {
-                if (this.currentQuiz < quizQuestions.length - 1) {
-                    this.currentQuiz++;
-                    this.updateQuiz();
-                } else {
-                    this.showResults();
-                }
-            },
+    startQuiz() {
+        // Stop video by blanking iframe src
+        document.getElementById('lesson-video').src = '';
+        this.currentQuiz = 0;
+        this.score = 0;
+        this.updateQuiz();
+        this.showView('view-quiz');
+    },
 
-            showResults() {
-                document.getElementById('final-score').innerText = `${this.score} / ${quizQuestions.length}`;
-                this.showView('view-results');
-            },
+    updateQuiz() {
+        const q = quizQuestions[this.currentQuiz];
+        this.isAnswering = false;
+        document.getElementById('quiz-counter').textContent = `Question ${this.currentQuiz + 1} / ${quizQuestions.length}`;
+        document.getElementById('quiz-question').textContent = q.question;
+        document.getElementById('quiz-explanation').classList.add('hidden');
+        document.getElementById('btn-quiz-next').classList.add('hidden');
 
-            reset() {
-                this.showView('view-intro');
-            }
-        };
+        const container = document.getElementById('quiz-options');
+        container.innerHTML = '';
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.textContent = opt;
+            btn.onclick = () => this.handleAnswer(idx);
+            container.appendChild(btn);
+        });
+    },
 
-        // Initialize App
-        window.onload = () => {
-            app.showView('view-intro');
-        };
-    </script>
+    handleAnswer(selectedIdx) {
+        if (this.isAnswering) return;
+        this.isAnswering = true;
+
+        const q = quizQuestions[this.currentQuiz];
+        const buttons = document.getElementById('quiz-options').querySelectorAll('.quiz-option');
+
+        buttons.forEach(b => b.disabled = true);
+
+        if (selectedIdx === q.correctAnswer) {
+            this.score++;
+            buttons[selectedIdx].classList.add('correct');
+        } else {
+            buttons[selectedIdx].classList.add('wrong');
+            buttons[q.correctAnswer].classList.add('correct');
+        }
+
+        document.getElementById('quiz-explanation').textContent = q.explanation;
+        document.getElementById('quiz-explanation').classList.remove('hidden');
+        document.getElementById('btn-quiz-next').classList.remove('hidden');
+        document.getElementById('btn-quiz-next-text').textContent =
+            (this.currentQuiz === quizQuestions.length - 1) ? 'View Results' : 'Next Question';
+    },
+
+    nextQuestion() {
+        if (this.currentQuiz < quizQuestions.length - 1) {
+            this.currentQuiz++;
+            this.updateQuiz();
+        } else {
+            this.showResults();
+        }
+    },
+
+    showResults() {
+        document.getElementById('final-score').textContent = `${this.score} / ${quizQuestions.length}`;
+        this.showView('view-results');
+    },
+
+    reset() {
+        this.showView('view-intro');
+    }
+};
+
+window.onload = () => app.showView('view-intro');
+</script>
 </body>
 </html>
-
